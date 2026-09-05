@@ -1,0 +1,19 @@
+{
+  "name": "edu-3n-v4-0",
+  "version": "4.0.0",
+  "description": "Hệ sinh thái Giáo dục Số Edu 3 Nhà v4.0 - Kết nối Nhà trường, Phụ huynh và Học sinh (Vercel & Google Apps Script)",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "school-management",
+    "vietqr",
+    "google-apps-script",
+    "rbac",
+    "vercel"
+  ],
+  "author": "Antigravity EduTech Solution",
+  "license": "MIT"
+}
