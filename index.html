@@ -99,8 +99,8 @@
         <div class="bg-white p-5 rounded-2xl border shadow-sm flex justify-between items-center">
           <div>
             <p class="text-xs text-slate-500 font-semibold uppercase">Tổng Số Học Sinh</p>
-            <h3 class="text-2xl font-black text-slate-800 mt-1" id="stat-students">1,248</h3>
-            <p class="text-[11px] text-emerald-600 mt-0.5">3 Khối: 10, 11, 12</p>
+            <h3 class="text-2xl font-black text-slate-800 mt-1" id="stat-students">4</h3>
+            <p class="text-[11px] text-emerald-600 mt-0.5" id="stat-students-sub">2 Lớp: 10A1, 12A1</p>
           </div>
           <div class="w-12 h-12 rounded-xl bg-blue-50 text-edu flex items-center justify-center text-xl"><i class="fa-solid fa-user-graduate"></i></div>
         </div>
@@ -108,8 +108,8 @@
         <div class="bg-white p-5 rounded-2xl border shadow-sm flex justify-between items-center">
           <div>
             <p class="text-xs text-slate-500 font-semibold uppercase">Chuyên Cần Toàn Trường</p>
-            <h3 class="text-2xl font-black text-emerald-600 mt-1" id="stat-attendance">98.5%</h3>
-            <p class="text-[11px] text-slate-500 mt-0.5">Hôm nay: 12 vắng có phép</p>
+            <h3 class="text-2xl font-black text-emerald-600 mt-1" id="stat-attendance">75.0%</h3>
+            <p class="text-[11px] text-slate-500 mt-0.5" id="stat-attendance-sub">2 có mặt, 1 đi muộn, 1 nghỉ phép</p>
           </div>
           <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl"><i class="fa-solid fa-clipboard-user"></i></div>
         </div>
@@ -117,8 +117,8 @@
         <div class="bg-white p-5 rounded-2xl border shadow-sm flex justify-between items-center">
           <div>
             <p class="text-xs text-slate-500 font-semibold uppercase">Học Phí Đã Thu (VietQR)</p>
-            <h3 class="text-2xl font-black text-edu mt-1" id="stat-tuition">78.4%</h3>
-            <p class="text-[11px] text-emerald-600 mt-0.5">Tự động gạch nợ sau 3s</p>
+            <h3 class="text-2xl font-black text-edu mt-1" id="stat-tuition">82.1%</h3>
+            <p class="text-[11px] text-emerald-600 mt-0.5" id="stat-tuition-sub">Đã thu: 3.900.000 đ / 4.750.000 đ (3/4 HS)</p>
           </div>
           <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl"><i class="fa-solid fa-qrcode"></i></div>
         </div>
@@ -127,7 +127,7 @@
           <div>
             <p class="text-xs text-slate-500 font-semibold uppercase">Hạ Tầng Vận Hành</p>
             <h3 class="text-2xl font-black text-purple-600 mt-1">0 VNĐ</h3>
-            <p class="text-[11px] text-purple-600 mt-0.5">Vercel + Google Apps Script</p>
+            <p class="text-[11px] text-purple-600 mt-0.5">Google Sheets + Apps Script</p>
           </div>
           <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl"><i class="fa-solid fa-cloud"></i></div>
         </div>
@@ -437,12 +437,19 @@
     <!-- ========================================================================= -->
     <div id="section-student" class="hidden space-y-6">
       <div class="bg-white p-6 rounded-2xl border shadow-sm">
-        <div class="flex items-center justify-between pb-4 border-b mb-4">
+        <div class="flex flex-wrap items-center justify-between pb-4 border-b mb-4 gap-3">
           <div>
-            <h3 class="font-bold text-base text-slate-800">Thời Khóa Biểu Tuần - Lớp 10A1</h3>
-            <p class="text-xs text-slate-500">Phòng học cố định: P.201 • Năm học 2026 - 2027</p>
+            <h3 class="font-bold text-base text-slate-800" id="student-schedule-title">Thời Khóa Biểu Tuần - Lớp 10A1</h3>
+            <p class="text-xs text-slate-500">Đồng bộ trực tiếp từ Google Sheets • Năm học 2026 - 2027</p>
           </div>
-          <span class="text-xs bg-blue-100 text-edu px-3 py-1 rounded-full font-bold">Học Kỳ 1</span>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-slate-600">Chọn Lớp:</span>
+            <select id="student-class-select" onchange="renderStudentView()" class="text-xs border rounded-lg px-3 py-1.5 font-bold text-edu outline-none">
+              <option value="10A1">Lớp 10A1</option>
+              <option value="12A1">Lớp 12A1</option>
+            </select>
+            <span class="text-xs bg-blue-100 text-edu px-3 py-1 rounded-full font-bold">Học Kỳ 1</span>
+          </div>
         </div>
 
         <div class="overflow-x-auto">
@@ -457,31 +464,7 @@
                 <th class="border p-2.5">Thứ Sáu</th>
               </tr>
             </thead>
-            <tbody class="divide-y">
-              <tr>
-                <td class="border p-2.5 text-center font-bold bg-slate-50">1</td>
-                <td class="border p-2.5"><span class="font-bold text-edu">Chào cờ</span><br><span class="text-[10px] text-slate-400">Sân trường</span></td>
-                <td class="border p-2.5"><span class="font-bold text-edu">Ngữ văn</span><br><span class="text-[10px] text-slate-400">Cô Hạnh (P.201)</span></td>
-                <td class="border p-2.5"><span class="font-bold text-edu">Lịch sử</span><br><span class="text-[10px] text-slate-400">Thầy Châu (P.201)</span></td>
-                <td class="border p-2.5"><span class="font-bold text-edu">Vật lý</span><br><span class="text-[10px] text-slate-400">Thầy Bình (P.201)</span></td>
-                <td class="border p-2.5"><span class="font-bold text-edu">Toán</span><br><span class="text-[10px] text-slate-400">Thầy Hùng (P.201)</span></td>
-              </tr>
-              <tr>
-                <td class="border p-2.5 text-center font-bold bg-slate-50">2</td>
-                <td class="border p-2.5"><span class="font-bold text-edu">Toán</span><br><span class="text-[10px] text-slate-400">Thầy Hùng (P.201)</span></td>
-                <td class="border p-2.5"><span class="font-bold text-edu">Ngữ văn</span><br><span class="text-[10px] text-slate-400">Cô Hạnh (P.201)</span></td>
-                <td class="border p-2.5"><span class="font-bold text-edu">Địa lý</span><br><span class="text-[10px] text-slate-400">Cô Thủy (P.201)</span></td>
-                <td class="border p-2.5"><span class="font-bold text-edu">Hóa học</span><br><span class="text-[10px] text-slate-400">Thầy Tấn (P.201)</span></td>
-                <td class="border p-2.5"><span class="font-bold text-edu">Tiếng Anh</span><br><span class="text-[10px] text-slate-400">Cô Mai (Lab 1)</span></td>
-              </tr>
-              <tr>
-                <td class="border p-2.5 text-center font-bold bg-slate-50">3</td>
-                <td class="border p-2.5"><span class="font-bold text-edu">Toán</span><br><span class="text-[10px] text-slate-400">Thầy Hùng (P.201)</span></td>
-                <td class="border p-2.5"><span class="font-bold text-edu">Hóa học</span><br><span class="text-[10px] text-slate-400">Thầy Tấn (TN Hóa)</span></td>
-                <td class="border p-2.5"><span class="font-bold text-edu">Toán</span><br><span class="text-[10px] text-slate-400">Thầy Hùng (P.201)</span></td>
-                <td class="border p-2.5"><span class="font-bold text-edu">Ngữ văn</span><br><span class="text-[10px] text-slate-400">Cô Hạnh (P.201)</span></td>
-                <td class="border p-2.5"><span class="font-bold text-edu">Tin học</span><br><span class="text-[10px] text-slate-400">Thầy Nam (Máy 2)</span></td>
-              </tr>
+            <tbody id="student-schedule-tbody" class="divide-y">
             </tbody>
           </table>
         </div>
@@ -489,22 +472,8 @@
 
       <!-- Lịch Thi Định Kỳ Của Học Sinh -->
       <div class="bg-white p-6 rounded-2xl border shadow-sm">
-        <h3 class="font-bold text-base text-slate-800 mb-3">📅 Lịch Thi Giữa Kỳ 1 Của Bạn</h3>
-        <div class="space-y-2.5 text-xs">
-          <div class="p-3 bg-slate-50 rounded-xl border flex justify-between items-center">
-            <div>
-              <span class="font-bold text-slate-800">Môn Toán Giữa Kỳ 1</span>
-              <p class="text-slate-500 mt-0.5">Ngày: 25/10/2026 • 07:30 • Trắc nghiệm 90 phút (SBD: 10A1001 - 10A1045)</p>
-            </div>
-            <span class="px-3 py-1 rounded bg-blue-100 text-edu font-bold">Phòng Hội trường A</span>
-          </div>
-          <div class="p-3 bg-slate-50 rounded-xl border flex justify-between items-center">
-            <div>
-              <span class="font-bold text-slate-800">Môn Ngữ Văn Giữa Kỳ 1</span>
-              <p class="text-slate-500 mt-0.5">Ngày: 26/10/2026 • 07:30 • Tự luận 120 phút (SBD: 10A1001 - 10A1045)</p>
-            </div>
-            <span class="px-3 py-1 rounded bg-blue-100 text-edu font-bold">Phòng Hội trường A</span>
-          </div>
+        <h3 class="font-bold text-base text-slate-800 mb-3">📅 Lịch Thi Định Kỳ Của Lớp</h3>
+        <div id="student-exam-container" class="space-y-2.5 text-xs">
         </div>
       </div>
     </div>
@@ -599,7 +568,7 @@
 
   <!-- ================= SCRIPT LOGIC TOÀN HỆ THỐNG ================= -->
   <script>
-    // 1. DỮ LIỆU CƠ SỞ ĐẦU VÀO
+    // 1. DỮ LIỆU CƠ SỞ ĐẦU VÀO (ĐỒNG BỘ 100% GOOGLE SHEETS MASTER)
     let currentDb = {
       students: [
         { id: "HS1001", name: "Nguyễn Minh An", class: "10A1", parent: "Nguyễn Văn Tuấn", phone: "0912345678", math: 8.5, lit: 8.0, eng: 9.0, phys: 8.0, chem: 8.5, gpa: 8.4, rank: "Giỏi", conduct: "Tốt", att: "CO_MAT", note: "Đến đúng giờ" },
@@ -608,10 +577,27 @@
         { id: "HS1201", name: "Phạm Quỳnh Anh", class: "12A1", parent: "Phạm Văn Hậu", phone: "0944556677", math: 9.2, lit: 8.8, eng: 9.0, phys: 9.5, chem: 9.0, gpa: 9.1, rank: "Xuất sắc", conduct: "Tốt", att: "CO_MAT", note: "Đến đúng giờ" }
       ],
       invoices: [
-        { id: "INV2601", studentId: "HS1001", name: "Nguyễn Minh An", class: "10A1", title: "Học phí Tháng 09/2026", amount: 1200000, status: "CHUA_DONG" },
+        { id: "INV2601", studentId: "HS1001", name: "Nguyễn Minh An", class: "10A1", title: "Học phí Tháng 09/2026", amount: 1200000, status: "DA_THANH_TOAN" },
         { id: "INV2602", studentId: "HS1002", name: "Trần Bảo Châu", class: "10A1", title: "Học phí Tháng 09/2026", amount: 1200000, status: "DA_THANH_TOAN" },
         { id: "INV2603", studentId: "HS1003", name: "Lê Hoàng Long", class: "10A1", title: "Tiền Bán trú Tháng 09", amount: 850000, status: "CHUA_DONG" },
-        { id: "INV2604", studentId: "HS1201", name: "Phạm Quỳnh Anh", class: "12A1", title: "Học phí & Ôn thi TN", amount: 1500000, status: "DA_THANH_TOAN" }
+        { id: "INV2604", studentId: "HS1201", name: "Phạm Quỳnh Anh", class: "12A1", title: "Học phí & Ôn thi TN T9", amount: 1500000, status: "DA_THANH_TOAN" }
+      ],
+      schedule: [
+        { Ma_Lop: "10A1", Ten_Lop: "10A1", Thu: "Thu_2", Buoi: "Sang", Tiet: 1, Mon_Hoc: "Chào cờ", Giao_Vien: "Ban Giám Hiệu", Phong_Hoc: "Sân trường" },
+        { Ma_Lop: "10A1", Ten_Lop: "10A1", Thu: "Thu_2", Buoi: "Sang", Tiet: 2, Mon_Hoc: "Toán", Giao_Vien: "Thầy Nguyễn Văn Hùng", Phong_Hoc: "Phòng 201" },
+        { Ma_Lop: "10A1", Ten_Lop: "10A1", Thu: "Thu_2", Buoi: "Sang", Tiet: 3, Mon_Hoc: "Toán", Giao_Vien: "Thầy Nguyễn Văn Hùng", Phong_Hoc: "Phòng 201" },
+        { Ma_Lop: "10A1", Ten_Lop: "10A1", Thu: "Thu_2", Buoi: "Sang", Tiet: 4, Mon_Hoc: "Tiếng Anh", Giao_Vien: "Cô Lê Thị Mai", Phong_Hoc: "Phòng Lab 1" },
+        { Ma_Lop: "10A1", Ten_Lop: "10A1", Thu: "Thu_2", Buoi: "Sang", Tiet: 5, Mon_Hoc: "Vật lý", Giao_Vien: "Thầy Trần Đức Bình", Phong_Hoc: "Phòng 201" },
+        { Ma_Lop: "10A1", Ten_Lop: "10A1", Thu: "Thu_3", Buoi: "Sang", Tiet: 1, Mon_Hoc: "Ngữ văn", Giao_Vien: "Cô Phạm Hồng Hạnh", Phong_Hoc: "Phòng 201" },
+        { Ma_Lop: "10A1", Ten_Lop: "10A1", Thu: "Thu_3", Buoi: "Sang", Tiet: 2, Mon_Hoc: "Ngữ văn", Giao_Vien: "Cô Phạm Hồng Hạnh", Phong_Hoc: "Phòng 201" },
+        { Ma_Lop: "10A1", Ten_Lop: "10A1", Thu: "Thu_3", Buoi: "Sang", Tiet: 3, Mon_Hoc: "Hóa học", Giao_Vien: "Thầy Đỗ Trọng Tấn", Phong_Hoc: "Phòng TN Hóa" },
+        { Ma_Lop: "12A1", Ten_Lop: "12A1", Thu: "Thu_2", Buoi: "Sang", Tiet: 2, Mon_Hoc: "Toán", Giao_Vien: "Thầy Lê Bá Khánh", Phong_Hoc: "Phòng 401" },
+        { Ma_Lop: "12A1", Ten_Lop: "12A1", Thu: "Thu_2", Buoi: "Sang", Tiet: 3, Mon_Hoc: "Toán", Giao_Vien: "Thầy Lê Bá Khánh", Phong_Hoc: "Phòng 401" }
+      ],
+      exams: [
+        { Ma_Lop: "10A1", Mon_Thi: "Toán Giữa Kỳ 1", Ngay_Thi: "2026-10-25", Gio_Thi: "07:30", Phong_Thi: "Phòng Hội trường A", Hinh_Thuc: "Trắc nghiệm 90 phút", So_Bao_Danh_Range: "10A1001 - 10A1045", Ghi_Chu: "Có mặt trước 15 phút" },
+        { Ma_Lop: "10A1", Mon_Thi: "Ngữ văn Giữa Kỳ 1", Ngay_Thi: "2026-10-26", Gio_Thi: "07:30", Phong_Thi: "Phòng Hội trường A", Hinh_Thuc: "Tự luận 120 phút", So_Bao_Danh_Range: "10A1001 - 10A1045", Ghi_Chu: "Dùng bút mực xanh hoặc đen" },
+        { Ma_Lop: "12A1", Mon_Thi: "Toán Học Kỳ 1", Ngay_Thi: "2026-12-15", Gio_Thi: "07:30", Phong_Thi: "Nhà Đa năng", Hinh_Thuc: "Trắc nghiệm chuẩn Bộ (90p)", So_Bao_Danh_Range: "12A1001 - 12A1042", Ghi_Chu: "Tô phiếu trắc nghiệm 2B" }
       ],
       leaveRequests: [
         { id: "LV001", studentId: "HS1003", name: "Lê Hoàng Long", class: "10A1", date: "2026-09-05", session: "Cả ngày", reason: "Em bị sốt cao cần đi khám bệnh", status: "PENDING" }
@@ -628,6 +614,52 @@
     }
 
     let activeViewingBackup = null;
+
+    // Cập nhật thống kê Dashboard theo dữ liệu thực tế thời gian thực
+    function updateAdminStats() {
+      // 1. Sĩ số & Số lớp
+      const totalStudents = currentDb.students.length;
+      const elStudents = document.getElementById('stat-students');
+      const elStudentsSub = document.getElementById('stat-students-sub');
+      if (elStudents) elStudents.innerText = totalStudents;
+      if (elStudentsSub) {
+        const classes = [...new Set(currentDb.students.map(s => s.class))];
+        elStudentsSub.innerText = `${classes.length} Lớp: ${classes.join(', ')}`;
+      }
+
+      // 2. Chuyên cần toàn trường
+      let coMat = 0, diMuon = 0, nghiPhep = 0, nghiKhongPhep = 0;
+      currentDb.students.forEach(s => {
+        if (s.att === 'CO_MAT') coMat++;
+        else if (s.att === 'DI_MUON') diMuon++;
+        else if (s.att === 'NGHI_CO_PHEP') nghiPhep++;
+        else if (s.att === 'NGHI_KHONG_PHEP') nghiKhongPhep++;
+      });
+      const totalAtt = currentDb.students.length || 1;
+      const attRate = (((coMat + diMuon) / totalAtt) * 100).toFixed(1);
+      const elAtt = document.getElementById('stat-attendance');
+      const elAttSub = document.getElementById('stat-attendance-sub');
+      if (elAtt) elAtt.innerText = `${attRate}%`;
+      if (elAttSub) elAttSub.innerText = `${coMat} có mặt, ${diMuon} đi muộn, ${nghiPhep} nghỉ phép${nghiKhongPhep > 0 ? `, ${nghiKhongPhep} không phép` : ''}`;
+
+      // 3. Học phí đã thu
+      let totalAmt = 0;
+      let paidAmt = 0;
+      let paidCount = 0;
+      currentDb.invoices.forEach(inv => {
+        const amt = Number(inv.amount) || 0;
+        totalAmt += amt;
+        if (inv.status === 'DA_THANH_TOAN') {
+          paidAmt += amt;
+          paidCount++;
+        }
+      });
+      const tuitionRate = totalAmt > 0 ? ((paidAmt / totalAmt) * 100).toFixed(1) : '0.0';
+      const elTuition = document.getElementById('stat-tuition');
+      const elTuitionSub = document.getElementById('stat-tuition-sub');
+      if (elTuition) elTuition.innerText = `${tuitionRate}%`;
+      if (elTuitionSub) elTuitionSub.innerText = `Đã thu: ${paidAmt.toLocaleString('vi-VN')} đ / ${totalAmt.toLocaleString('vi-VN')} đ (${paidCount}/${currentDb.invoices.length} HS)`;
+    }
 
     // 2. CHUYỂN ĐỔI VAI TRÒ
     function switchRole(role) {
@@ -655,30 +687,37 @@
       if (role === 'admin') renderAdminView();
       if (role === 'teacher') renderTeacherView();
       if (role === 'parent') parentChangeStudent();
+      if (role === 'student') {
+        updateStudentClassSelect();
+        renderStudentView();
+      }
     }
 
     // 3. ADMIN VIEW
     function renderAdminView() {
+      updateAdminStats();
       const tb = document.getElementById('admin-tuition-tbody');
-      tb.innerHTML = currentDb.invoices.map(inv => `
-        <tr class="hover:bg-slate-50">
-          <td class="p-3 font-mono font-bold text-slate-700">${inv.id}</td>
-          <td class="p-3 font-medium">${inv.name} <span class="text-slate-400">(${inv.studentId})</span></td>
-          <td class="p-3 font-bold text-edu">${inv.class}</td>
-          <td class="p-3 text-slate-600">${inv.title}</td>
-          <td class="p-3 text-right font-black text-slate-800">${inv.amount.toLocaleString('vi-VN')} đ</td>
-          <td class="p-3 text-center">
-            ${inv.status === 'DA_THANH_TOAN' 
-              ? '<span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">ĐÃ THANH TOÁN</span>'
-              : '<span class="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-bold">CHƯA ĐÓNG</span>'}
-          </td>
-          <td class="p-3 text-center">
-            <a href="https://img.vietqr.io/image/vietinbank-113366668888-compact2.png?amount=${inv.amount}&addInfo=HP%20${inv.studentId}" target="_blank" class="px-2.5 py-1 rounded bg-blue-50 text-edu font-bold hover:bg-edu hover:text-white transition">
-              <i class="fa-solid fa-qrcode"></i> Xem QR
-            </a>
-          </td>
-        </tr>
-      `).join('');
+      if (tb) {
+        tb.innerHTML = currentDb.invoices.map(inv => `
+          <tr class="hover:bg-slate-50">
+            <td class="p-3 font-mono font-bold text-slate-700">${inv.id}</td>
+            <td class="p-3 font-medium">${inv.name} <span class="text-slate-400">(${inv.studentId})</span></td>
+            <td class="p-3 font-bold text-edu">${inv.class}</td>
+            <td class="p-3 text-slate-600">${inv.title}</td>
+            <td class="p-3 text-right font-black text-slate-800">${(Number(inv.amount) || 0).toLocaleString('vi-VN')} đ</td>
+            <td class="p-3 text-center">
+              ${inv.status === 'DA_THANH_TOAN' 
+                ? '<span class="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">ĐÃ THANH TOÁN</span>'
+                : '<span class="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-bold">CHƯA ĐÓNG</span>'}
+            </td>
+            <td class="p-3 text-center">
+              <a href="https://img.vietqr.io/image/vietinbank-113366668888-compact2.png?amount=${inv.amount}&addInfo=HP%20${inv.studentId}" target="_blank" class="px-2.5 py-1 rounded bg-blue-50 text-edu font-bold hover:bg-edu hover:text-white transition">
+                <i class="fa-solid fa-qrcode"></i> Xem QR
+              </a>
+            </td>
+          </tr>
+        `).join('');
+      }
       renderBackupHistory();
     }
 
@@ -751,6 +790,7 @@
       const cls = document.getElementById('teacher-class-select').value;
       currentDb.students.filter(s => s.class === cls).forEach(s => s.att = 'CO_MAT');
       renderTeacherView();
+      updateAdminStats();
     }
 
     function saveAttendanceAlert() {
@@ -781,7 +821,12 @@
 
     function approveLeave(idx) {
       currentDb.leaveRequests[idx].status = 'APPROVED';
+      const studentId = currentDb.leaveRequests[idx].studentId;
+      const s = currentDb.students.find(st => st.id === studentId);
+      if (s) s.att = 'NGHI_CO_PHEP';
       renderLeaveRequests();
+      renderTeacherView();
+      updateAdminStats();
       alert("✅ Đã phê duyệt đơn xin nghỉ phép! Trạng thái điểm danh của học sinh đã cập nhật thành NGHỈ CÓ PHÉP.");
     }
 
@@ -885,6 +930,97 @@
       const alertBox = document.getElementById('parent-leave-alert');
       alertBox.classList.remove('hidden');
       alertBox.innerHTML = `✅ Đã gửi đơn thành công ngày ${date} (${session})! GVCN lớp ${s.class} đã nhận được thông báo.`;
+    }
+
+    // 5.1 PHÂN HỆ HỌC SINH (STUDENT VIEW) & BỘ ĐỒNG BỘ DROPDOWN CÁC CẤP
+    function updateTeacherClassSelect() {
+      const sel = document.getElementById('teacher-class-select');
+      if (!sel) return;
+      const currentVal = sel.value;
+      const classes = [...new Set(currentDb.students.map(s => s.class))];
+      sel.innerHTML = classes.map(cls => {
+        const count = currentDb.students.filter(s => s.class === cls).length;
+        return `<option value="${cls}">Lớp ${cls} (Sĩ số: ${count})</option>`;
+      }).join('');
+      if (classes.includes(currentVal)) {
+        sel.value = currentVal;
+      }
+    }
+
+    function updateParentStudentSelect() {
+      const sel = document.getElementById('parent-student-select');
+      if (!sel) return;
+      const currentVal = sel.value;
+      sel.innerHTML = currentDb.students.map(s => 
+        `<option value="${s.id}">${s.id} - ${s.name} (Lớp ${s.class})</option>`
+      ).join('');
+      if (currentDb.students.some(s => s.id === currentVal)) {
+        sel.value = currentVal;
+      } else if (currentDb.students.length > 0) {
+        sel.value = currentDb.students[0].id;
+      }
+    }
+
+    function updateStudentClassSelect() {
+      const sel = document.getElementById('student-class-select');
+      if (!sel) return;
+      const currentVal = sel.value;
+      const classes = [...new Set(currentDb.students.map(s => s.class))];
+      sel.innerHTML = classes.map(cls => `<option value="${cls}">Lớp ${cls}</option>`).join('');
+      if (classes.includes(currentVal)) {
+        sel.value = currentVal;
+      }
+    }
+
+    function renderStudentView() {
+      const sel = document.getElementById('student-class-select');
+      const cls = sel ? sel.value : (currentDb.students[0] ? currentDb.students[0].class : '10A1');
+      const titleEl = document.getElementById('student-schedule-title');
+      if (titleEl) titleEl.innerText = `Thời Khóa Biểu Tuần - Lớp ${cls}`;
+
+      // Render Thời khóa biểu lớp
+      const tbody = document.getElementById('student-schedule-tbody');
+      if (tbody) {
+        const days = ['Thu_2', 'Thu_3', 'Thu_4', 'Thu_5', 'Thu_6'];
+        let html = '';
+        for (let tiet = 1; tiet <= 5; tiet++) {
+          html += `<tr class="hover:bg-slate-50">
+            <td class="border p-2.5 font-bold text-center bg-slate-50">Tiết ${tiet}</td>`;
+          days.forEach(day => {
+            const item = (currentDb.schedule || []).find(x => (x.Ma_Lop === cls || x.Ten_Lop === cls) && x.Thu === day && Number(x.Tiet) === tiet);
+            if (item) {
+              html += `<td class="border p-2.5">
+                <span class="font-bold text-edu block">${item.Mon_Hoc}</span>
+                <span class="text-slate-500 text-[10px] block">${item.Giao_Vien || ''} (${item.Phong_Hoc || ''})</span>
+              </td>`;
+            } else {
+              html += `<td class="border p-2.5 text-slate-300 italic text-[11px]">-</td>`;
+            }
+          });
+          html += `</tr>`;
+        }
+        tbody.innerHTML = html;
+      }
+
+      // Render Lịch thi của lớp
+      const examContainer = document.getElementById('student-exam-container');
+      if (examContainer) {
+        const exams = (currentDb.exams || []).filter(e => e.Ma_Lop === cls);
+        if (exams.length === 0) {
+          examContainer.innerHTML = `<p class="text-slate-400">Không có lịch thi sắp tới cho Lớp ${cls}.</p>`;
+        } else {
+          examContainer.innerHTML = exams.map(e => `
+            <div class="p-3.5 bg-slate-50 rounded-xl border flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <p class="font-bold text-slate-800 text-xs">${e.Mon_Thi}</p>
+                <p class="text-slate-500 text-[11px]">Ngày thi: <strong>${e.Ngay_Thi}</strong> • Bắt đầu: <strong>${e.Gio_Thi}</strong> • Địa điểm: <strong>${e.Phong_Thi}</strong></p>
+                <p class="text-[10px] text-slate-400">Hình thức: ${e.Hinh_Thuc} • Danh sách SBD: ${e.So_Bao_Danh_Range} • Lưu ý: ${e.Ghi_Chu}</p>
+              </div>
+              <span class="px-2.5 py-1 bg-blue-100 text-edu font-bold rounded-lg text-xs">Đã Lên Lịch</span>
+            </div>
+          `).join('');
+        }
+      }
     }
 
     // 6. TÍNH NĂNG IMPORT EXCEL (.XLSX) BẰNG SHEETJS
@@ -1038,45 +1174,109 @@
       }
     }
 
-    async function syncFromGoogleSheets() {
+    async function syncFromGoogleSheets(silent = false) {
       const url = (document.getElementById('gas-url-input') && document.getElementById('gas-url-input').value.trim()) || localStorage.getItem('edu_gas_url') || DEFAULT_GAS_URL;
       const btn = document.getElementById('btn-sync-gas');
       const originalText = btn ? btn.innerHTML : '';
-      if (btn) {
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang tải...';
+      if (btn && !silent) {
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang đồng bộ...';
         btn.disabled = true;
       }
       try {
         const res = await fetch(url + '?action=getData');
         const data = await res.json();
-        if (data.Hoc_Phi_Invoices && data.Hoc_Phi_Invoices.length > 0) {
-          data.Hoc_Phi_Invoices.forEach(inv => {
-            const existing = currentDb.invoices.find(i => i.studentId === inv.Ma_HS);
-            if (existing) {
-              existing.status = inv.Trang_Thai || existing.status;
-              existing.amount = Number(inv.So_Tien) || existing.amount;
-              existing.name = inv.Ho_Ten || existing.name;
-            } else {
-              currentDb.invoices.push({
-                id: inv.Ma_Hoa_Don || ('INV' + inv.Ma_HS),
-                studentId: inv.Ma_HS,
-                name: inv.Ho_Ten,
-                class: inv.Lop || '10A1',
-                title: inv.Ky_Thu || 'Học phí HK1',
-                amount: Number(inv.So_Tien) || 1200000,
-                status: inv.Trang_Thai || 'CHUA_DONG'
-              });
-            }
+
+        // 1. Đồng bộ Danh sách Học Sinh & Điểm Số & Điểm Danh
+        if (data.Hoc_Sinh && data.Hoc_Sinh.length > 0) {
+          currentDb.students = data.Hoc_Sinh.map(hs => {
+            const bd = (data.Bang_Diem || []).find(b => b.Ma_HS === hs.Ma_HS) || {};
+            const dd = (data.Diem_Danh || []).find(d => d.Ma_HS === hs.Ma_HS) || {};
+
+            return {
+              id: hs.Ma_HS,
+              name: hs.Ho_Ten,
+              class: hs.Lop || '10A1',
+              parent: hs.Ho_Ten_PH || '',
+              phone: hs.SDT_PH || '',
+              dob: hs.Ngay_Sinh || '',
+              gender: hs.Gioi_Tinh || '',
+              address: hs.Dia_Chi || '',
+              math: Number(bd.Toan) || 0,
+              lit: Number(bd.Ngu_Van) || 0,
+              eng: Number(bd.Tieng_Anh) || 0,
+              phys: Number(bd.Vat_Ly) || 0,
+              chem: Number(bd.Hoa_Hoc) || 0,
+              gpa: Number(bd.Diem_TB) || 0,
+              rank: bd.Hoc_Luc || 'Khá',
+              conduct: bd.Hanh_Kiem || 'Tốt',
+              att: dd.Trang_Thai || 'CO_MAT',
+              note: dd.Ghi_Chu || ''
+            };
           });
         }
+
+        // 2. Đồng bộ Học Phí Invoices
+        if (data.Hoc_Phi_Invoices && data.Hoc_Phi_Invoices.length > 0) {
+          currentDb.invoices = data.Hoc_Phi_Invoices.map(inv => {
+            const student = currentDb.students.find(s => s.id === inv.Ma_HS);
+            return {
+              id: inv.Ma_Hoa_Don || ('INV' + inv.Ma_HS),
+              studentId: inv.Ma_HS,
+              name: inv.Ho_Ten || (student ? student.name : ''),
+              class: (student ? student.class : (inv.Lop || '10A1')),
+              title: inv.Khoan_Thu || 'Học phí Tháng 09/2026',
+              amount: Number(inv.So_Tien) || 0,
+              status: inv.Trang_Thai || 'CHUA_DONG',
+              dueDate: inv.Han_Nop || '',
+              paidAt: inv.Ngay_Thanh_Toan || '',
+              vietQrLink: inv.VietQR_Link || ''
+            };
+          });
+        }
+
+        // 3. Đồng bộ Thời khóa biểu
+        if (data.TKB_NhaTruong && data.TKB_NhaTruong.length > 0) {
+          currentDb.schedule = data.TKB_NhaTruong;
+        }
+
+        // 4. Đồng bộ Lịch thi
+        if (data.LichThi_Master && data.LichThi_Master.length > 0) {
+          currentDb.exams = data.LichThi_Master;
+        }
+
+        // Tự động cập nhật toàn diện Dashboard & các phân hệ
+        updateAdminStats();
         renderAdminView();
-        if (typeof parentChangeStudent === 'function') parentChangeStudent();
-        alert("✅ ĐỒNG BỘ THÀNH CÔNG TỪ GOOGLE SHEETS!\nDữ liệu học phí và học sinh đã được cập nhật theo thời gian thực.");
+        updateTeacherClassSelect();
+        renderTeacherView();
+        updateParentStudentSelect();
+        parentChangeStudent();
+        updateStudentClassSelect();
+        renderStudentView();
+
+        if (!silent) {
+          const totalStudents = currentDb.students.length;
+          let paidAmt = currentDb.invoices.filter(i => i.status === 'DA_THANH_TOAN').reduce((acc, i) => acc + (Number(i.amount) || 0), 0);
+          let totalAmt = currentDb.invoices.reduce((acc, i) => acc + (Number(i.amount) || 0), 0);
+          let pct = totalAmt > 0 ? ((paidAmt / totalAmt) * 100).toFixed(1) : 0;
+          let presentCount = currentDb.students.filter(s => s.att === 'CO_MAT' || s.att === 'DI_MUON').length;
+          let attPct = totalStudents > 0 ? ((presentCount / totalStudents) * 100).toFixed(1) : 0;
+
+          alert(`✅ ĐỒNG BỘ THÀNH CÔNG VỚI GOOGLE SHEETS!\n\n` +
+                `• Sĩ số toàn trường: ${totalStudents} học sinh\n` +
+                `• Tỷ lệ chuyên cần: ${attPct}%\n` +
+                `• Học phí thu được: ${paidAmt.toLocaleString('vi-VN')} đ / ${totalAmt.toLocaleString('vi-VN')} đ (${pct}%)\n` +
+                `• Thời khóa biểu: ${currentDb.schedule.length} tiết đã nạp\n` +
+                `• Lịch thi: ${currentDb.exams.length} môn thi đã nạp\n\n` +
+                `Toàn bộ dữ liệu hiển thị trên Dashboard đã được cập nhật chính xác 100%!`);
+        }
       } catch (err) {
         console.error("Lỗi đồng bộ GAS:", err);
-        alert("⚠️ Không thể tải dữ liệu tự động từ GAS: " + err.message + "\nHãy đảm bảo script đã được triển khai Web App với quyền Anyone.");
+        if (!silent) {
+          alert("⚠️ Không thể tải dữ liệu tự động từ Google Sheets: " + err.message + "\nHãy đảm bảo Google Apps Script đã được triển khai Web App với quyền Anyone.");
+        }
       } finally {
-        if (btn) {
+        if (btn && !silent) {
           btn.innerHTML = originalText;
           btn.disabled = false;
         }
@@ -1115,7 +1315,11 @@
       });
 
       closeAddStudentModal();
+      updateAdminStats();
       renderAdminView();
+      updateTeacherClassSelect();
+      updateParentStudentSelect();
+      updateStudentClassSelect();
       alert("✅ Đã thêm học sinh mới thành công!");
     }
 
@@ -1157,8 +1361,17 @@
       }, 500);
     }
 
-    // Khởi tạo
+    // Khởi tạo toàn bộ giao diện theo CSDL đồng bộ
+    updateTeacherClassSelect();
+    updateParentStudentSelect();
+    updateStudentClassSelect();
     renderAdminView();
+    renderTeacherView();
+    parentChangeStudent();
+    renderStudentView();
+
+    // Tự động đồng bộ số liệu mới nhất từ Google Sheets ngầm ngay khi tải trang
+    syncFromGoogleSheets(true);
   </script>
 </body>
 </html>
