@@ -19,11 +19,36 @@ var CONFIG = {
   SHEET_ATTENDANCE: "Diem_Danh",
   SHEET_STUDENT: "Hoc_Sinh",
   SHEET_GRADES: "Bang_Diem",
-  SHEET_SCHEDULE: "TKB_NhaTruong"
+  SHEET_SCHEDULE: "TKB_NhaTruong",
+  SHEET_EXAM: "LichThi_Master",
+  SHEET_USERS: "Nguoi_Dung" // Sheet ẩn lưu thông tin đăng nhập theo yêu cầu
 };
 
 /**
- * 1. WEBHOOK POST (TIẾP NHẬN BIẾN ĐỘNG SỐ DƯ TỪ SEPAY / CASSO)
+ * HÀM KHỞI TẠO VÀ ẨN SHEET NGƯỜI DÙNG NẾU CHƯA CÓ
+ */
+function getOrCreateUserSheet(ss) {
+  var sheet = ss.getSheetByName(CONFIG.SHEET_USERS);
+  if (!sheet) {
+    sheet = ss.insertSheet(CONFIG.SHEET_USERS);
+    sheet.appendRow([
+      "Ten_Nguoi_Dung", "Chuc_Vu", "So_Dien_Thoai", "Zalo", "Email", "Pin", "Trang_Thai", "Ngay_Tao"
+    ]);
+    sheet.appendRow(["Thầy Hiệu Trưởng", "Admin", "0912345678", "0912345678", "admin@tanphu.edu.vn", "123456", "HOAT_DONG", new Date().toLocaleString("vi-VN")]);
+    sheet.appendRow(["Cô Phạm Hồng Hạnh", "GiaoVien", "0987654321", "0987654321", "giaovien@tanphu.edu.vn", "123456", "HOAT_DONG", new Date().toLocaleString("vi-VN")]);
+    sheet.appendRow(["Nguyễn Văn Tuấn (PH)", "PhuHuynh", "0903112233", "0903112233", "phuhuynh@tanphu.edu.vn", "123456", "HOAT_DONG", new Date().toLocaleString("vi-VN")]);
+    sheet.appendRow(["Nguyễn Minh An", "HocSinh", "0944556677", "0944556677", "hocsinh@tanphu.edu.vn", "123456", "HOAT_DONG", new Date().toLocaleString("vi-VN")]);
+    try {
+      sheet.hideSheet(); // Ẩn sheet người dùng theo yêu cầu bảo mật
+    } catch (e) {
+      Logger.log("hideSheet error: " + e.toString());
+    }
+  }
+  return sheet;
+}
+
+/**
+ * 1. WEBHOOK POST (TIẾP NHẬN BIẾN ĐỘNG SỐ DƯ TỪ SEPAY / CASSO & ĐĂNG KÝ/ĐỔI PIN)
  */
 function doPost(e) {
   try {
@@ -35,6 +60,53 @@ function doPost(e) {
 
     var contents = e.postData ? e.postData.contents : "{}";
     var payload = JSON.parse(contents);
+
+    // 1.1 XỬ LÝ ĐĂNG KÝ TÀI KHOẢN MỚI TỪ WEB APP
+    if (payload.action === "register_user" || payload.action === "register") {
+      var sheetUser = getOrCreateUserSheet(ss);
+      var name = payload.name || payload.Ten_Nguoi_Dung || "";
+      var role = payload.role || payload.Chuc_Vu || "HocSinh";
+      var phone = payload.phone || payload.So_Dien_Thoai || "";
+      var zalo = payload.zalo || payload.Zalo || phone;
+      var email = (payload.email || payload.Email || "").trim().toLowerCase();
+      var pin = payload.pin || payload.Pin || "123456";
+
+      var data = sheetUser.getDataRange().getValues();
+      var exists = false;
+      for (var i = 1; i < data.length; i++) {
+        if (String(data[i][4]).trim().toLowerCase() === email) {
+          exists = true;
+          break;
+        }
+      }
+      if (exists) {
+        return ContentService.createTextOutput(JSON.stringify({ success: false, message: "Email này đã được đăng ký!" }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+      sheetUser.appendRow([name, role, phone, zalo, email, pin, "HOAT_DONG", new Date().toLocaleString("vi-VN")]);
+      return ContentService.createTextOutput(JSON.stringify({ success: true, message: "Đăng ký thành công!", user: { name: name, role: role, email: email } }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // 1.2 XỬ LÝ ĐỔI / QUÊN MÃ PIN TỪ WEB APP
+    if (payload.action === "forgot_pin") {
+      var sheetUser = getOrCreateUserSheet(ss);
+      var email = (payload.email || "").trim().toLowerCase();
+      var phone = (payload.phone || "").trim();
+      var newPin = (payload.newPin || payload.pin || "").trim();
+
+      var data = sheetUser.getDataRange().getValues();
+      var updated = false;
+      for (var i = 1; i < data.length; i++) {
+        if (String(data[i][4]).trim().toLowerCase() === email && String(data[i][2]).trim() === phone) {
+          sheetUser.getRange(i + 1, 6).setValue(newPin);
+          updated = true;
+          break;
+        }
+      }
+      return ContentService.createTextOutput(JSON.stringify(updated ? { success: true, message: "Đặt lại mã PIN thành công!" } : { success: false, message: "Không tìm thấy Email hoặc Số điện thoại khớp!" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
 
     // Bóc tách nội dung chuyển khoản ngân hàng
     var rawContent = (payload.content || payload.description || "").toUpperCase();
@@ -105,14 +177,85 @@ function doPost(e) {
   }
 }
 
-/**
- * 2. REST API GET (TRẢ DỮ LIỆU ĐỂ WEB APP VERCEL / GITHUB GỌI ĐỒNG BỘ)
- */
 function doGet(e) {
   var action = e.parameter ? e.parameter.action : "";
   var ss = SpreadsheetApp.getActiveSpreadsheet();
 
-  // API LẤY TOÀN BỘ DỮ LIỆU CSDL ĐỂ WEB APP HIỂN THỊ
+  // Đảm bảo Sheet Người dùng tồn tại và được ẩn
+  getOrCreateUserSheet(ss);
+
+  // 2.1 API XÁC THỰC ĐĂNG NHẬP
+  if (action === "auth_login" || action === "login") {
+    var sheetUser = getOrCreateUserSheet(ss);
+    var email = (e.parameter.email || "").trim().toLowerCase();
+    var pin = (e.parameter.pin || "").trim();
+    var data = sheetUser.getDataRange().getValues();
+    var found = null;
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][4]).trim().toLowerCase() === email && String(data[i][5]).trim() === pin) {
+        found = {
+          name: data[i][0],
+          role: data[i][1],
+          phone: data[i][2],
+          zalo: data[i][3],
+          email: data[i][4],
+          status: data[i][6]
+        };
+        break;
+      }
+    }
+    return ContentService.createTextOutput(JSON.stringify(found ? { success: true, user: found } : { success: false, message: "Sai Email hoặc mã PIN!" }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // 2.2 API ĐĂNG KÝ TÀI KHOẢN (HỖ TRỢ GET ĐỂ TRÁNH CORS)
+  if (action === "auth_register" || action === "register") {
+    var sheetUser = getOrCreateUserSheet(ss);
+    var name = e.parameter.name || "";
+    var role = e.parameter.role || "HocSinh";
+    var phone = e.parameter.phone || "";
+    var zalo = e.parameter.zalo || phone;
+    var email = (e.parameter.email || "").trim().toLowerCase();
+    var pin = e.parameter.pin || "123456";
+
+    var data = sheetUser.getDataRange().getValues();
+    var exists = false;
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][4]).trim().toLowerCase() === email) {
+        exists = true;
+        break;
+      }
+    }
+    if (exists) {
+      return ContentService.createTextOutput(JSON.stringify({ success: false, message: "Email này đã được đăng ký!" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    sheetUser.appendRow([name, role, phone, zalo, email, pin, "HOAT_DONG", new Date().toLocaleString("vi-VN")]);
+    return ContentService.createTextOutput(JSON.stringify({ success: true, message: "Đăng ký thành công!", user: { name: name, role: role, email: email } }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // 2.3 API QUÊN MÃ PIN
+  if (action === "auth_forgot" || action === "forgot_pin") {
+    var sheetUser = getOrCreateUserSheet(ss);
+    var email = (e.parameter.email || "").trim().toLowerCase();
+    var phone = (e.parameter.phone || "").trim();
+    var newPin = (e.parameter.newPin || e.parameter.pin || "").trim();
+
+    var data = sheetUser.getDataRange().getValues();
+    var updated = false;
+    for (var i = 1; i < data.length; i++) {
+      if (String(data[i][4]).trim().toLowerCase() === email && String(data[i][2]).trim() === phone) {
+        sheetUser.getRange(i + 1, 6).setValue(newPin);
+        updated = true;
+        break;
+      }
+    }
+    return ContentService.createTextOutput(JSON.stringify(updated ? { success: true, message: "Đặt lại mã PIN thành công!" } : { success: false, message: "Không tìm thấy Email hoặc Số điện thoại khớp!" }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // 2.4 API LẤY TOÀN BỘ DỮ LIỆU CSDL ĐỂ WEB APP HIỂN THỊ
   if (action === "getData" || action === "data") {
     var result = {};
     var sheets = ss.getSheets();
@@ -140,7 +283,7 @@ function doGet(e) {
       .setMimeType(ContentService.MimeType.JSON);
   }
 
-  // API ĐƠN XIN NGHỈ PHÉP
+  // 2.5 API ĐƠN XIN NGHỈ PHÉP
   if (action === "leave") {
     var studentId = e.parameter.studentId || "";
     var studentName = e.parameter.studentName || "";
@@ -170,7 +313,10 @@ function doGet(e) {
     message: "Cổng Google Apps Script Giáo Dục THPT Tân Phú đang hoạt động 100%!",
     endpoints: {
       post_webhook_vietqr: "POST [URL_HIEN_TAI]",
-      get_database_data: "GET [URL_HIEN_TAI]?action=getData"
+      get_database_data: "GET [URL_HIEN_TAI]?action=getData",
+      auth_login: "GET/POST ?action=auth_login",
+      auth_register: "GET/POST ?action=auth_register",
+      auth_forgot: "GET/POST ?action=auth_forgot"
     }
   })).setMimeType(ContentService.MimeType.JSON);
 }
