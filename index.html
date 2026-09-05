@@ -194,12 +194,15 @@
             <h4 class="font-bold text-xs text-slate-800 flex items-center gap-2">
               <i class="fa-solid fa-link text-blue-600"></i> Cấu Hình Liên Kết Google Apps Script (0đ Chi Phí)
             </h4>
-            <p class="text-[11px] text-slate-500">Dán URL Web App của Google Apps Script để đồng bộ 2 chiều với Google Sheets</p>
+            <p class="text-[11px] text-slate-500">Đã kết nối trực tiếp với Google Sheets <span class="font-mono text-blue-700">Edu_3n_School_Master_Database</span></p>
           </div>
-          <div class="flex items-center gap-2 flex-1 max-w-md">
-            <input type="text" id="gas-url-input" placeholder="https://script.google.com/macros/s/.../exec" class="flex-1 text-xs border rounded-lg px-3 py-1.5 outline-none">
-            <button onclick="saveGasUrl()" class="px-3 py-1.5 bg-edu text-white text-xs font-bold rounded-lg hover:bg-blue-800">
-              Lưu URL
+          <div class="flex items-center gap-2 flex-1 max-w-lg">
+            <input type="text" id="gas-url-input" value="https://script.google.com/macros/s/AKfycbx8QRpG1hRMoi-PgJ7cmLT6NOweoEl-JvNscQQO3GhxGTkCjUI29GCD6XBmhBjOaVKuOQ/exec" placeholder="https://script.google.com/macros/s/.../exec" class="flex-1 text-xs border rounded-lg px-3 py-1.5 outline-none font-mono">
+            <button onclick="saveGasUrl()" class="px-3 py-1.5 bg-slate-700 text-white text-xs font-bold rounded-lg hover:bg-slate-800 transition">
+              Lưu
+            </button>
+            <button id="btn-sync-gas" onclick="syncFromGoogleSheets()" class="px-3.5 py-1.5 bg-emerald-600 text-white text-xs font-bold rounded-lg hover:bg-emerald-700 transition flex items-center gap-1.5 shadow-sm">
+              <i class="fa-solid fa-rotate"></i> Đồng Bộ Google Sheets
             </button>
           </div>
         </div>
@@ -831,10 +834,31 @@
       }
     }
 
-    function parentSimulatePay() {
+    async function parentSimulatePay() {
       const sid = document.getElementById('parent-student-select').value;
       const inv = currentDb.invoices.find(i => i.studentId === sid);
       if (inv) inv.status = 'DA_THANH_TOAN';
+
+      const url = (document.getElementById('gas-url-input') && document.getElementById('gas-url-input').value.trim()) || localStorage.getItem('edu_gas_url') || DEFAULT_GAS_URL;
+
+      if (url && inv) {
+        try {
+          fetch(url, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              gateway: "Vietcombank",
+              transferAmount: inv.amount,
+              content: "HP " + sid + " " + inv.name,
+              referenceCode: "VCB." + Date.now()
+            })
+          });
+        } catch (e) {
+          console.log("GAS Webhook POST:", e);
+        }
+      }
+
       alert(`⚡ XÁC NHẬN: Cổng SePAY/Google Apps Script đã nhận tiền và gạch nợ học phí của học sinh ${sid} trong 3 giây!`);
       parentChangeStudent();
       renderAdminView();
@@ -1004,11 +1028,58 @@
     }
 
     // 8. CẤU HÌNH LIÊN KẾT GOOGLE APPS SCRIPT
+    const DEFAULT_GAS_URL = "https://script.google.com/macros/s/AKfycbx8QRpG1hRMoi-PgJ7cmLT6NOweoEl-JvNscQQO3GhxGTkCjUI29GCD6XBmhBjOaVKuOQ/exec";
+
     function saveGasUrl() {
       const url = document.getElementById('gas-url-input').value.trim();
       if (url) {
         localStorage.setItem('edu_gas_url', url);
         alert("✅ Đã lưu Google Apps Script Web App URL!\nHệ thống sẵn sàng đồng bộ 2 chiều với Google Sheets.");
+      }
+    }
+
+    async function syncFromGoogleSheets() {
+      const url = (document.getElementById('gas-url-input') && document.getElementById('gas-url-input').value.trim()) || localStorage.getItem('edu_gas_url') || DEFAULT_GAS_URL;
+      const btn = document.getElementById('btn-sync-gas');
+      const originalText = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang tải...';
+        btn.disabled = true;
+      }
+      try {
+        const res = await fetch(url + '?action=getData');
+        const data = await res.json();
+        if (data.Hoc_Phi_Invoices && data.Hoc_Phi_Invoices.length > 0) {
+          data.Hoc_Phi_Invoices.forEach(inv => {
+            const existing = currentDb.invoices.find(i => i.studentId === inv.Ma_HS);
+            if (existing) {
+              existing.status = inv.Trang_Thai || existing.status;
+              existing.amount = Number(inv.So_Tien) || existing.amount;
+              existing.name = inv.Ho_Ten || existing.name;
+            } else {
+              currentDb.invoices.push({
+                id: inv.Ma_Hoa_Don || ('INV' + inv.Ma_HS),
+                studentId: inv.Ma_HS,
+                name: inv.Ho_Ten,
+                class: inv.Lop || '10A1',
+                title: inv.Ky_Thu || 'Học phí HK1',
+                amount: Number(inv.So_Tien) || 1200000,
+                status: inv.Trang_Thai || 'CHUA_DONG'
+              });
+            }
+          });
+        }
+        renderAdminView();
+        if (typeof parentChangeStudent === 'function') parentChangeStudent();
+        alert("✅ ĐỒNG BỘ THÀNH CÔNG TỪ GOOGLE SHEETS!\nDữ liệu học phí và học sinh đã được cập nhật theo thời gian thực.");
+      } catch (err) {
+        console.error("Lỗi đồng bộ GAS:", err);
+        alert("⚠️ Không thể tải dữ liệu tự động từ GAS: " + err.message + "\nHãy đảm bảo script đã được triển khai Web App với quyền Anyone.");
+      } finally {
+        if (btn) {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }
       }
     }
 
